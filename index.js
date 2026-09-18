@@ -57,7 +57,7 @@ function createTransactionElement(transaction) {
         <span>${transaction.description}</span>
 
         <span>
-            ${transaction.amount}
+            ${formatCurrency(transaction.amount)}
             <button 
                 class="delete-btn" 
                 onclick="removeTransaction(${transaction.id})"
@@ -71,5 +71,44 @@ function createTransactionElement(transaction) {
 function updateSummary() {
   // 100, -50, 200, -200, => 50
 
-  const balance = transactions.reduce(() =>);
+  const bal = transactions.reduce((acc, transaction) => acc + transaction.amount, 0);
+
+  //for income
+  const inc = transactions
+    .filter((transaction) => transaction.amount > 0)   // kinukuha niya yung positive values
+    .reduce((acc, transaction) => acc + transaction.amount, 0);  //tinototal lahat ng values. acc = running total / naiipong value.
+
+  // for expense
+  const exp = transactions
+    .filter((transaction) => transaction.amount <0) // kinukuha lahat ng may negative sign for expense
+    .reduce((acc, transaction) => acc + transaction.amount, 0) 
+
+  //Html will display it on the website
+  balance.textContent = bal;
+  income.textContent = inc;
+  expense.textContent = exp;
+
 }
+
+
+function formatCurrency(number) {
+    return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+    }).format(number);
+}
+
+
+function removeTransaction(id) {
+    transactions = transactions.filter(transaction => transaction.id !==id)
+
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+
+    updateTransactionList();
+    updateSummary();
+}
+
+
+//Kapag ni refresh, magpapakita parin mga result base sa localstorage
+updateTransactionList();
+updateSummary();
