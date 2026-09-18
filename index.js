@@ -8,28 +8,68 @@ const amountEl = document.getElementById("amount");
 
 let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
 
+transactionForm.addEventListener("submit", addTransaction);
 
-transactionForm.addEventListener("submit", addTransaction)
+function addTransaction(e) {
+    e.preventDefault();
 
-function addTransaction (e) {
-    e.preventDefault();   //so it doesn't refresh the page
-
-    // get form values
     const description = des.value.trim();
     const amount = parseFloat(amountEl.value);
-    
-    transactions.push({ //push uses to add value at the end of the array
-      id:Date.now(),
-      description,
-      amount
+
+    transactions.push({
+        id: Date.now(),
+        description,
+        amount
     });
 
-    //to convert javascript object and array inro formatted strings
-    localStorage.setItem("transactions",JSON.stringify(transactions));
+    localStorage.setItem("transactions", JSON.stringify(transactions));
 
     updateTransactionList();
-    updateSummary();
+
+    // Hindi muna natin tatapusin ang updateSummary()
+     updateSummary();
 
     transactionForm.reset();
+}
 
+function updateTransactionList() {
+    transactionList.innerHTML = "";
+
+    const sortedTransactions = [...transactions].reverse();
+
+    sortedTransactions.forEach((transaction) => {
+        const transactionEl = createTransactionElement(transaction);
+
+        transactionList.appendChild(transactionEl);
+    });
+}
+
+function createTransactionElement(transaction) {
+    const li = document.createElement("li");
+
+    li.classList.add("transaction");
+
+    li.classList.add(
+        transaction.amount > 0 ? "income" : "expense"
+    );
+
+    li.innerHTML = `
+        <span>${transaction.description}</span>
+
+        <span>
+            ${transaction.amount}
+            <button 
+                class="delete-btn" 
+                onclick="removeTransaction(${transaction.id})"
+            >×</button>
+        </span>
+    `;
+
+    return li;
+}
+
+function updateSummary() {
+  // 100, -50, 200, -200, => 50
+
+  const balance = transactions.reduce(() =>);
 }
